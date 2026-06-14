@@ -84,6 +84,7 @@ function selectedV2WorkspaceID(
 }
 
 function defaultDirectory(request: HttpServerRequest.HttpServerRequest, url: URL): string {
+  if (process.env.OPENCODE_FIXED_DIRECTORY) return process.env.OPENCODE_FIXED_DIRECTORY
   return url.searchParams.get("directory") || request.headers["x-opencode-directory"] || process.cwd()
 }
 

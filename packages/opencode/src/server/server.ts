@@ -100,7 +100,7 @@ const listenEffect: (opts: ListenOptions) => Effect.Effect<EffectListener, unkno
 function listenerLayer(opts: ListenOptions, port: number) {
   return HttpRouter.serve(HttpApiApp.createRoutes(opts), {
     middleware: disposeMiddleware,
-    disableLogger: true,
+    disableLogger: false,
     disableListenLog: true,
   }).pipe(
     Layer.provideMerge(WebSocketTracker.layer),

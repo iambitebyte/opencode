@@ -238,6 +238,18 @@ function HomeDesign() {
     navigate(pending.href)
   })
 
+  createEffect(() => {
+    const directory = sync.data.path.directory
+    if (!directory) return
+    const conn = focusedServer()
+    if (!conn) return
+    const ctx = global.createServerCtx(conn)
+    const exists = ctx.projects.list().some((project) => project.worktree === directory)
+    if (exists) return
+    ctx.projects.open(directory)
+    ctx.projects.touch(directory)
+  })
+
   function focusServer(conn: ServerConnection.Any) {
     setSelection({ server: ServerConnection.key(conn) })
   }
@@ -362,6 +374,7 @@ function HomeDesign() {
           openSettings={openSettings}
           openHelp={() => platform.openLink("https://opencode.ai/desktop-feedback")}
           language={language}
+          directory={sync.data.path.directory}
         />
 
         <section
@@ -448,6 +461,7 @@ function HomeProjectColumn(props: {
   openSettings: () => void
   openHelp: () => void
   language: ReturnType<typeof useLanguage>
+  directory?: string
 }) {
   const global = useGlobal()
   const dialog = useDialog()
@@ -456,16 +470,15 @@ function HomeProjectColumn(props: {
     <aside class="flex min-w-0 flex-col lg:pt-[52px] mt-14 gap-4" aria-label={props.language.t("home.projects")}>
       <div class="flex h-7 min-w-0 items-center justify-between pl-1.5">
         <div class={HOME_SECTION_LABEL}>{props.language.t("home.projects")}</div>
-        <Show when={global.servers.list().length === 1}>
-          <IconButtonV2
-            data-action="home-add-project"
-            variant="ghost-muted"
-            size="large"
-            class="titlebar-icon [&_[data-slot=icon-svg]]:text-v2-icon-icon-muted"
-            icon={<IconV2 name="folder-add-left" />}
-            onClick={() => props.chooseProject(global.servers.list()[0]!)}
-            aria-label={props.language.t("home.project.add")}
-          />
+        <Show when={props.directory}>
+          {(dir) => (
+            <div
+              class="text-12-mono text-v2-text-text-muted truncate max-w-[180px]"
+              title={dir()}
+            >
+              {dir()}
+            </div>
+          )}
         </Show>
       </div>
       <Show
@@ -566,14 +579,6 @@ function HomeServerRow(props: {
           onEdit={props.openEdit}
           open={state.menuOpen}
           onOpenChange={(open) => setState("menuOpen", open)}
-        />
-        <IconButtonV2
-          data-action="home-add-project"
-          variant="ghost-muted"
-          size="small"
-          icon={<IconV2 name="folder-add-left" />}
-          aria-label={props.language.t("home.project.add")}
-          onClick={() => props.chooseProject(props.server)}
         />
       </div>
     </div>
