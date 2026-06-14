@@ -239,7 +239,7 @@ function HomeDesign() {
   })
 
   createEffect(() => {
-    const directory = sync.data.path.directory
+    const directory = sync().data.path.directory
     if (!directory) return
     const conn = focusedServer()
     if (!conn) return
@@ -374,7 +374,7 @@ function HomeDesign() {
           openSettings={openSettings}
           openHelp={() => platform.openLink("https://opencode.ai/desktop-feedback")}
           language={language}
-          directory={sync.data.path.directory}
+          directory={sync().data.path.directory}
         />
 
         <section
