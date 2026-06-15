@@ -2,6 +2,7 @@ import FileTree from "@/components/file-tree"
 import { useFile } from "@/context/file"
 import { useLanguage } from "@/context/language"
 import { useFileComponent } from "@opencode-ai/ui/context/file"
+import { ScrollView } from "@opencode-ai/ui/scroll-view"
 import { sampledChecksum } from "@opencode-ai/core/util/encode"
 import { Dynamic } from "solid-js/web"
 import { createMemo, Show } from "solid-js"
@@ -44,21 +45,25 @@ export function BrowseTab(props: {
             </div>
           }
         >
-          <Dynamic
-            component={fileComponent}
-            mode="text"
-            file={{
-              name: props.selected()!,
-              contents: contents(),
-              cacheKey: cacheKey(),
-            }}
-            media={{
-              mode: "auto",
-              path: props.selected()!,
-              current: state()?.content,
-            }}
-            class="select-text"
-          />
+          <ScrollView class="h-full">
+            <div class="relative overflow-hidden pb-40">
+              <Dynamic
+                component={fileComponent}
+                mode="text"
+                file={{
+                  name: props.selected()!,
+                  contents: contents(),
+                  cacheKey: cacheKey(),
+                }}
+                media={{
+                  mode: "auto",
+                  path: props.selected()!,
+                  current: state()?.content,
+                }}
+                class="select-text"
+              />
+            </div>
+          </ScrollView>
         </Show>
       </div>
     </div>
