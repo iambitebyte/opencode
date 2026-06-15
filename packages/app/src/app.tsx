@@ -31,7 +31,7 @@ import { CommandProvider } from "@/context/command"
 import { CommentsProvider } from "@/context/comments"
 import { FileProvider } from "@/context/file"
 import { ServerSDKProvider } from "@/context/server-sdk"
-import { ServerSyncProvider } from "@/context/server-sync"
+import { ServerSyncProvider, useServerSync } from "@/context/server-sync"
 import { GlobalProvider } from "@/context/global"
 import { HighlightsProvider } from "@/context/highlights"
 import { LanguageProvider, type Locale, useLanguage } from "@/context/language"
@@ -260,6 +260,23 @@ function DraftProviders(props: ParentProps) {
   )
 }
 
+// The home page needs directory-scoped SDK + FileProvider so it can render
+// the file tree of the current (fixed) working directory. The directory is
+// resolved from the server sync data rather than the URL.
+function HomeProviders(props: ParentProps) {
+  const sync = useServerSync()
+  const directory = () => sync().data.path.directory
+  return (
+    <Show when={directory()} keyed>
+      {(dir) => (
+        <SDKProvider directory={dir}>
+          <FileProvider>{props.children}</FileProvider>
+        </SDKProvider>
+      )}
+    </Show>
+  )
+}
+
 export function AppBaseProviders(props: ParentProps<{ locale?: Locale }>) {
   return (
     <MetaProvider>
@@ -449,7 +466,14 @@ export function AppInterface(props: {
             )}
           >
             <Route component={SelectedServerLayout}>
-              <Route path="/" component={HomeRoute} />
+              <Route
+                path="/"
+                component={() => (
+                  <HomeProviders>
+                    <HomeRoute />
+                  </HomeProviders>
+                )}
+              />
               <Route path="/:dir" component={DirectoryLayout}>
                 <Route path="/" component={() => <Navigate href="session" />} />
                 <Route path="/session/:id?" component={SessionRoute} />

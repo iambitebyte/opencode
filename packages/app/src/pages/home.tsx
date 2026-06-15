@@ -47,6 +47,7 @@ import { useSettings } from "@/context/settings"
 import { ServerRowMenu } from "@/components/server/server-row-menu"
 import { ServerHealthIndicator } from "@/components/server/server-row"
 import { type ServerHealth } from "@/utils/server-health"
+import FileTree from "@/components/file-tree"
 
 const HOME_SESSION_LIMIT = 64
 const HOME_ROW_LAYOUT =
@@ -514,6 +515,18 @@ function HomeProjectColumn(props: {
             )
           }}
         </For>
+      </Show>
+      <Show when={props.directory}>
+        {(dir) => (
+          <div class="mt-4 flex min-w-0 flex-col gap-1">
+            <div class="flex h-7 min-w-0 items-center pl-1.5">
+              <div class={HOME_SECTION_LABEL}>Files</div>
+            </div>
+            <ScrollView class="max-h-[min(300px,calc(100vh-360px))] min-h-0">
+              <FileTree path={dir()} draggable={false} />
+            </ScrollView>
+          </div>
+        )}
       </Show>
       <div class="mt-4 flex min-w-0 flex-col gap-1">
         <button
