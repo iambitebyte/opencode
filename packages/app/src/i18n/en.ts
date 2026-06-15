@@ -596,6 +596,7 @@ export const dict = {
   "session.tab.session": "Session",
   "session.tab.review": "Review",
   "session.tab.context": "Context",
+  "session.tab.browse": "Browse",
   "session.panel.reviewAndFiles": "Review and files",
   "session.review.filesChanged": "{{count}} Files Changed",
   "session.review.change.one": "Change",
@@ -612,6 +613,7 @@ export const dict = {
   "session.review.noUncommittedChanges": "No uncommitted changes yet",
   "session.review.noBranchChanges": "No branch changes yet",
 
+  "session.browse.empty": "Select a file to preview",
   "session.files.selectToOpen": "Select a file to open",
   "session.files.all": "All files",
   "session.files.empty": "No files",
