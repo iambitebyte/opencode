@@ -4,17 +4,18 @@ import { useLanguage } from "@/context/language"
 import { useFileComponent } from "@opencode-ai/ui/context/file"
 import { sampledChecksum } from "@opencode-ai/core/util/encode"
 import { Dynamic } from "solid-js/web"
-import { createMemo, createSignal, Show } from "solid-js"
+import { createMemo, Show } from "solid-js"
 
-export function BrowseTab() {
+export function BrowseTab(props: {
+  selected: () => string | null
+  setSelected: (path: string | null) => void
+}) {
   const file = useFile()
   const language = useLanguage()
   const fileComponent = useFileComponent()
 
-  const [selected, setSelected] = createSignal<string | null>(null)
-
   const state = createMemo(() => {
-    const path = selected()
+    const path = props.selected()
     if (!path) return
     return file.get(path)
   })
@@ -26,9 +27,9 @@ export function BrowseTab() {
       <div class="w-[280px] shrink-0 overflow-auto border-r border-border-base">
         <FileTree
           path=""
-          active={selected() ?? undefined}
+          active={props.selected() ?? undefined}
           onFileClick={(node) => {
-            setSelected(node.path)
+            props.setSelected(node.path)
             void file.load(node.path)
           }}
         />
@@ -36,7 +37,7 @@ export function BrowseTab() {
 
       <div class="flex-1 min-w-0 overflow-hidden">
         <Show
-          when={selected() && contents()}
+          when={props.selected() && contents()}
           fallback={
             <div class="h-full flex items-center justify-center text-text-weak text-14-regular">
               {language.t("session.browse.empty")}
@@ -47,13 +48,13 @@ export function BrowseTab() {
             component={fileComponent}
             mode="text"
             file={{
-              name: selected()!,
+              name: props.selected()!,
               contents: contents(),
               cacheKey: cacheKey(),
             }}
             media={{
               mode: "auto",
-              path: selected()!,
+              path: props.selected()!,
               current: state()?.content,
             }}
             class="select-text"

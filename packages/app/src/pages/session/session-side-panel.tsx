@@ -1,4 +1,4 @@
-import { For, Match, Show, Switch, createEffect, createMemo, onCleanup, type JSX } from "solid-js"
+import { For, Match, Show, Switch, createEffect, createMemo, createSignal, onCleanup, type JSX } from "solid-js"
 import { createStore } from "solid-js/store"
 import { createMediaQuery } from "@solid-primitives/media"
 import { Tabs } from "@opencode-ai/ui/tabs"
@@ -64,6 +64,8 @@ export function SessionSidePanel(props: {
 
   const isDesktop = createMediaQuery("(min-width: 768px)")
   const shown = settings.visibility.fileTree
+
+  const [browseSelected, setBrowseSelected] = createSignal<string | null>(null)
 
   const reviewOpen = createMemo(() => isDesktop() && view().reviewPanel.opened())
   const fileOpen = createMemo(
@@ -337,7 +339,7 @@ export function SessionSidePanel(props: {
 
                     <Tabs.Content value="browse" class="flex flex-col h-full overflow-hidden contain-strict">
                       <Show when={activeTab() === "browse"}>
-                        <BrowseTab />
+                        <BrowseTab selected={browseSelected} setSelected={setBrowseSelected} />
                       </Show>
                     </Tabs.Content>
 
