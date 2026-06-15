@@ -23,7 +23,7 @@ export function BrowseTab(props: {
   const cacheKey = createMemo(() => sampledChecksum(contents()))
 
   return (
-    <div class="flex h-full min-h-0">
+    <div class="flex flex-1 min-h-0 overflow-hidden">
       <div class="w-[280px] shrink-0 overflow-auto border-r border-border-base">
         <FileTree
           path=""
