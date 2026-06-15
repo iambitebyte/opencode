@@ -987,12 +987,8 @@ function NewSessionTabItem(props: { ref?: HTMLDivElement; href: string; title: s
 
 function ChannelIndicator() {
   return (
-    <>
-      {["beta", "dev"].includes(import.meta.env.VITE_OPENCODE_CHANNEL) && (
-        <div class="bg-icon-interactive-base text-[#FFF] font-medium px-2 rounded-sm uppercase font-mono">
-          {import.meta.env.VITE_OPENCODE_CHANNEL.toUpperCase()}
-        </div>
-      )}
-    </>
+    <div class="bg-icon-interactive-base text-[#FFF] font-medium px-2 rounded-sm font-mono">
+      Cola
+    </div>
   )
 }

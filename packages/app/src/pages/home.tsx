@@ -471,14 +471,17 @@ function HomeProjectColumn(props: {
       <div class="flex h-7 min-w-0 items-center justify-between pl-1.5">
         <div class={HOME_SECTION_LABEL}>{props.language.t("home.projects")}</div>
         <Show when={props.directory}>
-          {(dir) => (
-            <div
-              class="text-12-mono text-v2-text-text-muted truncate max-w-[180px]"
-              title={dir()}
-            >
-              {dir()}
-            </div>
-          )}
+          {(dir) => {
+            const name = dir().split(/[\\/]/).filter(Boolean).pop() ?? dir()
+            return (
+              <div
+                class="text-12-mono text-v2-text-text-muted truncate max-w-[180px]"
+                title={dir()}
+              >
+                {name}
+              </div>
+            )
+          }}
         </Show>
       </div>
       <Show

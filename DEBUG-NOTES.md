@@ -123,18 +123,40 @@ curl -s 'http://127.0.0.1:4096/session' | python3 -m json.tool
 
 ---
 
-### 改动 2：后端锁定固定工作目录
+### 改动 2：后端限定工作目录根（允许访问子目录）
 
-**文件**：`packages/opencode/src/server/routes/instance/httpapi/middleware/workspace-routing.ts` 第 86-88 行
+**文件**：`packages/opencode/src/server/routes/instance/httpapi/middleware/workspace-routing.ts` 第 86-103 行
 
 ```diff
  function defaultDirectory(request: HttpServerRequest.HttpServerRequest, url: URL): string {
-+  if (process.env.OPENCODE_FIXED_DIRECTORY) return process.env.OPENCODE_FIXED_DIRECTORY
+-  if (process.env.OPENCODE_FIXED_DIRECTORY) return process.env.OPENCODE_FIXED_DIRECTORY
++  const fixed = process.env.OPENCODE_FIXED_DIRECTORY
++  if (fixed) {
++    const requested = url.searchParams.get("directory") || (request.headers["x-opencode-directory"] as string | undefined)
++    if (requested && isWithinFixedDirectory(requested, fixed)) return requested
++    return fixed
++  }
    return url.searchParams.get("directory") || request.headers["x-opencode-directory"] || process.cwd()
  }
++
++function isWithinFixedDirectory(target: string, fixed: string): boolean {
++  const normalize = (p: string) => p.replace(/[\\/]+$/, "")
++  const a = normalize(target)
++  const b = normalize(fixed)
++  if (a === b) return true
++  const sep = target.includes("/") ? "/" : "\\"
++  return a.startsWith(b + sep)
++}
 ```
 
-**原因**：原逻辑下前端可通过 `directory=` query 参数浏览任意目录。设置 `OPENCODE_FIXED_DIRECTORY` 后，后端忽略所有 `directory` 参数，统一返回锁定路径。
+**原因**：早期版本是"硬锁"——设置 `OPENCODE_FIXED_DIRECTORY` 后忽略所有 `directory` 参数，统一返回锁定路径。这导致无法在锁定目录下切换/浏览子目录（例如锁定 `/Users/chen/Development` 后，无法打开其中的 `opencode` 子项目）。
+
+**当前行为**：把 `OPENCODE_FIXED_DIRECTORY` 当作"目录根围栏"——
+- 请求未指定 `directory`：返回 fixed
+- 请求指定了 `directory` 且**落在 fixed 内**（含 fixed 自身、其子目录）：返回请求的目录
+- 请求指定了 `directory` 但**逃出 fixed**：忽略请求，返回 fixed（兜底保护）
+
+围栏判定由 `isWithinFixedDirectory` 完成，对路径分隔符 `/` 和 `\` 都兼容（Windows 友好），并去掉尾部斜杠避免 `Development/` 和 `Development` 不一致。
 
 **用法**：
 
@@ -143,7 +165,7 @@ OPENCODE_FIXED_DIRECTORY=/Users/chen/Development \
   bun run --cwd packages/opencode --conditions=browser src/index.ts serve
 ```
 
-**联动效果**：`/path` 接口返回的 `directory` 字段也会变成锁定路径（因为 InstanceContext 用同一个目录），前端据此显示。
+**联动效果**：`/path` 接口返回的 `directory` 字段会落在 `[fixed, fixed/...]` 区间内（因为 InstanceContext 用同一个目录），前端据此显示。前端目录选择对话框从 fixed 根开始浏览，用户可以下钻到子项目。
 
 ---
 
