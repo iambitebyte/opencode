@@ -23,6 +23,7 @@ import { useSettings } from "@/context/settings"
 import { useSync } from "@/context/sync"
 import { createFileTabListSync } from "@/pages/session/file-tab-scroll"
 import { FileTabContent } from "@/pages/session/file-tabs"
+import { BrowseTab } from "@/pages/session/browse-tab"
 import {
   createOpenSessionFileTab,
   createSessionTabs,
@@ -271,6 +272,9 @@ export function SessionSidePanel(props: {
                             </div>
                           </Tabs.Trigger>
                         </Show>
+                        <Tabs.Trigger value="browse">
+                          <div>{language.t("session.tab.browse")}</div>
+                        </Tabs.Trigger>
                         <Show when={contextOpen()}>
                           <Tabs.Trigger
                             value="context"
@@ -330,6 +334,12 @@ export function SessionSidePanel(props: {
                         <Show when={reviewOpen() && activeTab() === "review"}>{props.reviewPanel()}</Show>
                       </Tabs.Content>
                     </Show>
+
+                    <Tabs.Content value="browse" class="flex flex-col h-full overflow-hidden contain-strict">
+                      <Show when={activeTab() === "browse"}>
+                        <BrowseTab />
+                      </Show>
+                    </Tabs.Content>
 
                     <Tabs.Content value="empty" class="flex flex-col h-full overflow-hidden contain-strict">
                       <Show when={activeTab() === "empty"}>
